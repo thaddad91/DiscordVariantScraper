@@ -28,6 +28,7 @@ var_perc = None
 # scrape GISAID data
 @bot.command()
 async def scrape(ctx):
+    print("Scraping...")
     global variants, countries, var_perc
     # get config with actual variants displayed
     pageconfig = requests.get('https://mendel3.bii.a-star.edu.sg/METHODS/corona/gamma/MUTATIONS/data/config.json')
@@ -65,6 +66,7 @@ async def scrape(ctx):
                 var_perc[var] = {var_json[i]['country']:var_json[i]['percvui_last4wks']}
             else:
                 var_perc[var].update({var_json[i]['country']:var_json[i]['percvui_last4wks']})
+        print(str(variant)+" done")
     await ctx.send("> GISAID has been scraped. :white_check_mark:")
 
 # parse scraped data to Discord
