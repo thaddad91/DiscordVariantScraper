@@ -10,8 +10,6 @@
 # - wrapper for scrape/parse?
 # - make up my mind about output formatting...
 
-#from os import name
-#import discord
 from discord.ext import commands
 import requests, re, json
 import country_converter as coco
@@ -80,10 +78,6 @@ async def parse(ctx):
     disclaimers = [discl1,discl2,discl3,discl4]
     await ctx.send("\n".join(disclaimers))
 
-    #header = "variant:"+"".join(["{:>9}".format(var[1].split()[0]) for var in variants])
-    #subheader = "alias:"+"".join(["{:>9}".format(var[0])for var in variants])
-    #await ctx.send("**> "+header+"**")
-
     # parse percentages per country, per variant
     for country in countries:
         percs = []
@@ -108,12 +102,8 @@ async def parse(ctx):
                 res[0],res[1]) if float(res[1])<50 
                 else "{}: **{}**".format(res[0],res[1]) 
                 for res in results])
-            #sent1 = "> "+iso+flag_iso + "".join(["{:<9}".format(var[1].split()[0]) for var in variants])
-            #sent2 = "```"+" "*8+"".join(["{:<6}".format(perc) for perc in percs])+"```"
-            #sentence = "> "+flag_iso + "    " + "".join(["{:>13}".format(perc) for perc in percs])
             await ctx.send(sent1)
             await ctx.send(sent2)
-            #await ctx.send("> "+flag_iso+"\t\t"+"\t\t".join(percs)+"")
         else:
             print(country, percs)
     await ctx.send("> All countries parsed. :white_check_mark:")
