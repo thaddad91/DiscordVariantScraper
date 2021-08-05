@@ -1,4 +1,4 @@
-# DiscordVariantScraper
+# Discord Variant Scraper
 Simple Discord bot that scrapes GISAID SARS-CoV-2 variant frequencies from the past 4 weeks and parses them on a per-country basis.
 
 It is still in very early development. First thing on the list is adding saving to file by serialization, so the scrape() and parse() functions can properly operate independent from one another, saving website requests.
