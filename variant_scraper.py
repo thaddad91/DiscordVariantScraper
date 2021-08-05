@@ -74,7 +74,7 @@ async def scrape(ctx):
 async def parse(ctx):
     global variants, countries, var_perc
     discl1 = "**> DISCLAIMER**"
-    discl2 = "> This bot summarizes the relative percentages of **submissions** of genomes from the tracked variant to GISAID."
+    discl2 = "> This bot scrapes the relative percentages of genome **submissions of the past 4 weeks** from the tracked variants to GISAID."
     discl3 = "> Observed frequencies are subject to sampling and reporting biases and **do not** represent exact prevalence."
     discl4 = "> See https://www.gisaid.org/hcov19-variants/ for more info."
     disclaimers = [discl1,discl2,discl3,discl4]
