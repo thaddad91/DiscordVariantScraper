@@ -4,7 +4,7 @@
 # Date:         05-08-2021 (dd/mm/yyyy)
 # Description:  First attempt at a Discord bot to scrape and parse 
 #               relative variant frequencies that are submitted to GISAID.
-#               All data belongs to the GISAID uploaders.
+#               All data belongs to their respective GISAID uploaders.
 # To-do:
 # - serialize scraping data to file for saving
 # - wrapper for scrape/parse?
