@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Author:       Thierry Haddad
+# Author:       tch
 # Date:         05-08-2021 (dd/mm/yyyy)
 # Description:  First attempt at a Discord bot to scrape and parse 
 #               relative variant frequencies that are submitted to GISAID.
