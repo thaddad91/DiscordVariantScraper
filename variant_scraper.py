@@ -7,12 +7,15 @@
 #               All data belongs to their respective GISAID uploaders.
 # To-do:
 # - serialize scraping data to file for saving
+# - command for variant-specific info
 # - wrapper for scrape/parse?
 # - make up my mind about output formatting...
 
+from os import EX_CANTCREAT
 from discord.ext import commands
 import requests, re, json
 import country_converter as coco
+import pickle
 
 # verification token for bot
 with open('variant_token.txt','r') as tokenfile:
@@ -67,12 +70,30 @@ async def scrape(ctx):
             else:
                 var_perc[var].update({var_json[i]['country']:var_json[i]['percvui_last4wks']})
         print(str(variant)+" done")
+    # save scraped data to file
+    print("Saving to file...")
+    with open("data.pickle","wb") as f:
+        pickle.dump([variants,countries,var_perc], f)
     await ctx.send("> GISAID has been scraped. :white_check_mark:")
 
 # parse scraped data to Discord
 @bot.command()   
 async def parse(ctx):
     global variants, countries, var_perc
+    # check if empty vars, if so -> try loading from file
+    if any([var == None for var in [variants, countries, var_perc]]):
+        try:
+            print("Reading data from file")
+            with open("data.pickle","rb") as f:
+                variants, countries, var_perc = pickle.load(f)
+            if any([var == None for var in [variants, countries, var_perc]]):
+                print("One or more files were empty, rerun !scrape")
+        except IOError as io:
+            print("Can't read the save file! Fix permission issues or rerun !scrape")
+            print(io)
+        except Exception as e:
+            print("Non-IOError, try rerunning !scrape")
+            print(e)
     discl1 = "**> DISCLAIMER**"
     discl2 = "> This bot scrapes the relative percentages of genome **submissions of the past 4 weeks** from the tracked variants to GISAID. The variants are limited to the Variants of Concern and Variants of Interest as listed by the WHO (https://www.who.int/en/activities/tracking-SARS-CoV-2-variants/)."
     discl3 = "> Observed frequencies are subject to sampling and reporting biases and **do not** represent exact prevalence."
