@@ -2,7 +2,7 @@
 Simple Discord bot that scrapes GISAID SARS-CoV-2 variant frequencies (https://www.gisaid.org/hcov19-variants/) from the past 4 weeks and parses them on a per-country basis. The variants are the Variants of Interest (VoI) and Variants of Concern (VoC) as listed by the WHO on https://www.who.int/en/activities/tracking-SARS-CoV-2-variants/. 
 
 It is still in very early development. 
-- First thing on the list is adding saving to file by serialization, so the scrape() and parse() functions can properly operate independent from one another, saving website requests.
+- ~~First thing on the list is adding saving to file by serialization, so the scrape() and parse() functions can properly operate independent from one another, saving website requests.~~ Done.
 - Currently thinking of a method to ask variant-specific data, e.g. '!delta' could show some aggregate info from public health services, mutation profile, maybe some recent article urls/abstracts
 - Also contemplating embedded images of graphs as an option instead of rows of percentages.
 
