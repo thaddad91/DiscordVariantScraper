@@ -12,4 +12,4 @@ Percentages are shown in **bold** when exceeding 50% submission contribution to 
 
 From GISAID: *"Observed frequencies are subject to sampling and reporting biases and do not represent exact prevalence."*
 
-![Alt text](images/Github_Example.png?raw=true "Title")
+![Alt text](images/Github_Example2.png?raw=true "Title")
