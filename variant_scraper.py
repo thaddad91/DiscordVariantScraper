@@ -6,7 +6,6 @@
 #               relative variant frequencies that are submitted to GISAID.
 #               All data belongs to their respective GISAID uploaders.
 # To-do:
-# - serialize scraping data to file for saving
 # - command for variant-specific info
 # - wrapper for scrape/parse?
 # - make up my mind about output formatting...
@@ -16,6 +15,7 @@ from discord.ext import commands
 import requests, re, json
 import country_converter as coco
 import pickle
+from lxml import etree
 
 # verification token for bot
 with open('variant_token.txt','r') as tokenfile:
@@ -130,5 +130,62 @@ async def parse(ctx):
         else:
             print(country, percs)
     await ctx.send("> All countries parsed. :white_check_mark:")
+
+def text(elt):
+    return elt.text_content().replace(u'\xa0', u' ')
+
+# Retrieve variant-specific aggregate info
+@bot.command()   
+async def vars(ctx):
+    global variants
+    print("\n\n\n\n\n\n")
+    # retrieve WHO variants text
+    who_page = requests.get("https://www.who.int/en/activities/tracking-SARS-CoV-2-variants/")
+    if who_page:
+        tree = etree.HTML(who_page.content)
+    # parse variant meta info from xpath
+
+    # VOC
+    voc_table = []
+    columns = [1,2,5,6]
+    rows = len(variants) if variants != None else 10
+    for i in range(1,rows):
+        for j in columns:
+            try: # to catch empty rows
+                print(i,j)
+                td = None
+                td = tree.xpath('//*[contains(@id,"PageContent_C238")]/div/div/table/tbody/tr[{}]/td[{}]/p'.format(i,j))
+                #print(td)
+                if not td == []:
+                    for k in td:
+                        content = etree.tostring(k)
+                        print(content)
+                        voc_table.append(content)
+                else:
+                    td = None
+                    td = tree.xpath('//*[contains(@id,"PageContent_C238")]/div/div/table/tbody/tr[{}]/td[{}]'.format(i,j))
+                    for k in td:
+                        print(k.text)
+                        content = etree.tostring(k)
+                        print(content)
+                        voc_table.append(content)
+            except:
+                continue
+    print(voc_table)
+
+    general_info = """The WHO currently categorizes two groups of variants:
+
+**Variants of Concern (VOC):**
+A SARS-CoV-2 variant that meets the definition of a VOI (see below) and, through a comparative assessment, has been demonstrated to be associated with one or more of the following changes at a degree of global public health significance: 
+    - Increase in transmissibility or detrimental change in COVID-19 epidemiology; OR
+    - Increase in virulence or change in clinical disease presentation; OR
+    - Decrease in effectiveness of public health and social measures or available diagnostics, vaccines, therapeutics.  
+    
+**Variants of Interest (VOI):**
+A SARS-CoV-2 variant : 
+    - with genetic changes that are predicted or known to affect virus characteristics such as transmissibility, disease severity, immune escape, diagnostic or therapeutic escape; AND 
+    - Identified to cause significant community transmission or multiple COVID-19 clusters, in multiple countries with increasing relative prevalence alongside increasing number of cases over time, or other apparent epidemiological impacts to suggest an emerging risk to global public health."""
+    #await ctx.send(general_info)
+    pass
 
 bot.run(TOKEN)
