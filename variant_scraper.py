@@ -10,12 +10,14 @@
 # - wrapper for scrape/parse?
 # - make up my mind about output formatting...
 
+import discord
 from os import EX_CANTCREAT
 from discord.ext import commands
 import requests, re, json
 import country_converter as coco
 import pickle
 from lxml import etree
+import imgkit
 
 # verification token for bot
 with open('variant_token.txt','r') as tokenfile:
@@ -138,40 +140,19 @@ def text(elt):
 @bot.command()   
 async def vars(ctx):
     global variants
-    print("\n\n\n\n\n\n")
-    # retrieve WHO variants text
     who_page = requests.get("https://www.who.int/en/activities/tracking-SARS-CoV-2-variants/")
     if who_page:
         tree = etree.HTML(who_page.content)
-    # parse variant meta info from xpath
-
-    # VOC
-    voc_table = []
-    columns = [1,2,5,6]
-    rows = len(variants) if variants != None else 10
-    for i in range(1,rows):
-        for j in columns:
-            try: # to catch empty rows
-                print(i,j)
-                td = None
-                td = tree.xpath('//*[contains(@id,"PageContent_C238")]/div/div/table/tbody/tr[{}]/td[{}]/p'.format(i,j))
-                #print(td)
-                if not td == []:
-                    for k in td:
-                        content = etree.tostring(k)
-                        print(content)
-                        voc_table.append(content)
-                else:
-                    td = None
-                    td = tree.xpath('//*[contains(@id,"PageContent_C238")]/div/div/table/tbody/tr[{}]/td[{}]'.format(i,j))
-                    for k in td:
-                        print(k.text)
-                        content = etree.tostring(k)
-                        print(content)
-                        voc_table.append(content)
-            except:
-                continue
-    print(voc_table)
+    # VoC table
+    voc = tree.xpath('//*[@id="PageContent_C238_Col01"]/div/div/table')
+    for v in voc:
+        v = str(etree.tostring(v)).rstrip("'").lstrip("b'")
+        imgkit.from_string(v,'voc.png')
+    # VoI table
+    voi = tree.xpath('//*[@id="PageContent_C237_Col01"]/div/div/table')
+    for v in voi:
+        v = str(etree.tostring(v)).rstrip("'").lstrip("b'")
+        imgkit.from_string(v,'voi.png')
 
     general_info = """The WHO currently categorizes two groups of variants:
 
@@ -184,8 +165,13 @@ A SARS-CoV-2 variant that meets the definition of a VOI (see below) and, through
 **Variants of Interest (VOI):**
 A SARS-CoV-2 variant : 
     - with genetic changes that are predicted or known to affect virus characteristics such as transmissibility, disease severity, immune escape, diagnostic or therapeutic escape; AND 
-    - Identified to cause significant community transmission or multiple COVID-19 clusters, in multiple countries with increasing relative prevalence alongside increasing number of cases over time, or other apparent epidemiological impacts to suggest an emerging risk to global public health."""
-    #await ctx.send(general_info)
-    pass
+    - Identified to cause significant community transmission or multiple COVID-19 clusters, in multiple countries with increasing relative prevalence alongside increasing number of cases over time, or other apparent epidemiological impacts to suggest an emerging risk to global public health.
+    
+    
+    """
+    await ctx.send(general_info)
+    for img in ["voc.png","voi.png"]:
+        await ctx.send(file=discord.File(img))
+    
 
 bot.run(TOKEN)
