@@ -18,6 +18,7 @@ import country_converter as coco
 import pickle
 from lxml import etree
 import imgkit
+from requests.api import head
 #from PIL import Image, ImageChops
 
 # verification token for bot
@@ -137,23 +138,36 @@ async def parse(ctx):
 def text(elt):
     return elt.text_content().replace(u'\xa0', u' ')
 
-# Retrieve variant information from the WHO
+# Retrieve variant information from the ECDC
 @bot.command()   
 async def variants(ctx):
     global variants
-    who_page = requests.get("https://www.who.int/en/activities/tracking-SARS-CoV-2-variants/")
-    if who_page:
-        tree = etree.HTML(who_page.content)
+    #who_page = requests.get("https://www.who.int/en/activities/tracking-SARS-CoV-2-variants/")
+    #if who_page:
+    #    tree = etree.HTML(who_page.content)
+
+    ecdc_page = requests.get("https://www.ecdc.europa.eu/en/covid-19/variants-concern")
+    if ecdc_page:
+        tree = etree.HTML(ecdc_page.content)
     # VoC table
-    voc = tree.xpath('//*[@id="PageContent_C238_Col01"]/div/div/table')
-    for v in voc:
-        v = str(etree.tostring(v)).rstrip("'").lstrip("b'")
-        imgkit.from_string(v,'voc.png')
+    #voc = tree.xpath('//*[@id="PageContent_C238_Col01"]/div/div/table') # WHO
+    #for v in voc:
+    #    v = str(etree.tostring(v)).rstrip("'").lstrip("b'")
+    #    imgkit.from_string(v,'voc.png')
     # VoI table
-    voi = tree.xpath('//*[@id="PageContent_C237_Col01"]/div/div/table')
-    for v in voi:
-        v = str(etree.tostring(v)).rstrip("'").lstrip("b'")
-        imgkit.from_string(v,'voi.png')
+    #voi = tree.xpath('//*[@id="PageContent_C237_Col01"]/div/div/table') # WHO
+    #for v in voi:
+    #    v = str(etree.tostring(v)).rstrip("'").lstrip("b'")
+    #    imgkit.from_string(v,'voi.png')
+
+    # Scrape all variant tables from ECDC
+    tables = tree.xpath('//table[@class="GridTable4-Accent61 table table-bordered table-striped"]')
+    files = []
+    for i,t in enumerate(tables):
+        v = str(etree.tostring(t)).rstrip("'").lstrip("b'").replace('\\n','').replace('\\t','')
+        filename = 'voi_{}.png'.format(i)
+        files.append(filename)
+        imgkit.from_string(v,filename)
 
     # VoC / VoI description from WHO
     general_info = """>>> The WHO currently categorizes two groups of variants:
@@ -168,10 +182,33 @@ A SARS-CoV-2 variant that meets the definition of a VOI (see below) and, through
 A SARS-CoV-2 variant : 
     - with genetic changes that are predicted or known to affect virus characteristics such as transmissibility, disease severity, immune escape, diagnostic or therapeutic escape; AND 
     - Identified to cause significant community transmission or multiple COVID-19 clusters, in multiple countries with increasing relative prevalence alongside increasing number of cases over time, or other apparent epidemiological impacts to suggest an emerging risk to global public health. \n\n"""
-    await ctx.send(general_info)
-    # Send VoC/VoI table images
-    for img in ["voc.png","voi.png"]:
-        await ctx.send(file=discord.File(img))
+    #await ctx.send(general_info)
+    #for img in ["voc.png","voi.png"]:
+        #await ctx.send(file=discord.File(img))
+
+    # Various variants groups + their description from ECDC
+    var_heads = [
+        [
+            "Variants of Concern (VOC)",
+            "For these variants, clear evidence is available indicating a significant impact on transmissibility, severity and/or immunity that is likely to have an impact on the epidemiological situation in the EU/EEA. The combined genomic, epidemiological, and in-vitro evidence for these properties invokes at least moderate confidence. In addition, all the criteria for variants of interest and under monitoring outlined below apply."
+            ],
+        [
+            "Variants of interest (VOI)",
+            "For these variants, evidence is available on genomic properties, epidemiological evidence or in-vitro evidence that could imply a significant impact on transmissibility, severity and/or immunity, realistically having an impact on the epidemiological situation in the EU/EEA. However, the evidence is still preliminary or is associated with major uncertainty. In addition, all the criteria for variants under monitoring outlined below apply."
+            ],
+        [
+            "Variants under monitoring",
+            "These additional variants of SARS-CoV-2 have been detected as signals through epidemic intelligence, rules-based genomic variant screening, or preliminary scientific evidence. There is some indication that they could have properties similar to those of a VOC, but the evidence is weak or has not yet been assessed by ECDC. Variants listed here must be present in at least one outbreak, detected in a community within the EU/EEA, or there must be evidence that there is community transmission of the variant elsewhere in the world."
+            ],
+        [
+            "De-escalated variants",
+            "These additional variants of SARS-CoV-2 have been de-escalated based on at least one the following criteria: (1) the variant is no longer circulating, (2) the variant has been circulating for a long time without any impact on the overall epidemiological situation, (3) scientific evidence demonstrates that the variant is not associated with any concerning properties."
+            ]
+    ]
+    for item in list(zip(files,var_heads)):
+        await ctx.send("**> {}**".format(item[1][0]))
+        await ctx.send("> {}".format(item[1][1]))
+        await ctx.send(file=discord.File(item[0]))
 
 # ImportError: dlopen(/Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/PIL/_imaging.cpython-39-darwin.so, 2): Symbol not found: _clock_gettime
 # probably needs newer OS
