@@ -5,10 +5,11 @@
 # Description:  First attempt at a Discord bot to scrape and parse 
 #               relative variant frequencies that are submitted to GISAID.
 #               All data belongs to their respective GISAID uploaders.
+#               Table data belongs to ECDC.
 # To-do:
-# - command for variant-specific info
-# - wrapper for scrape/parse?
-# - make up my mind about output formatting...
+# - send bot messages to channel instead of direct message
+# - command for variant-specific info, with recent papers, news etc.
+# - wrapper for scrape/parse
 
 import discord
 from os import EX_CANTCREAT
@@ -18,8 +19,8 @@ import country_converter as coco
 import pickle
 from lxml import etree
 import imgkit
-from requests.api import head
-#from PIL import Image, ImageChops
+#from requests.api import head
+from PIL import Image, ImageChops
 
 # verification token for bot
 with open('variant_token.txt','r') as tokenfile:
@@ -28,6 +29,9 @@ assert TOKEN != ""
 
 # define command prefix and global vars
 bot = commands.Bot(command_prefix='!')
+# Placeholder for bot message to specific channel
+# channel = bot.get_channel('032198472741')
+# await channel.send(msg)
 variants = None
 countries = None
 var_perc = None
@@ -142,23 +146,11 @@ def text(elt):
 @bot.command()   
 async def variants(ctx):
     global variants
-    #who_page = requests.get("https://www.who.int/en/activities/tracking-SARS-CoV-2-variants/")
-    #if who_page:
-    #    tree = etree.HTML(who_page.content)
 
+    # Scrape ECDC variant page
     ecdc_page = requests.get("https://www.ecdc.europa.eu/en/covid-19/variants-concern")
     if ecdc_page:
         tree = etree.HTML(ecdc_page.content)
-    # VoC table
-    #voc = tree.xpath('//*[@id="PageContent_C238_Col01"]/div/div/table') # WHO
-    #for v in voc:
-    #    v = str(etree.tostring(v)).rstrip("'").lstrip("b'")
-    #    imgkit.from_string(v,'voc.png')
-    # VoI table
-    #voi = tree.xpath('//*[@id="PageContent_C237_Col01"]/div/div/table') # WHO
-    #for v in voi:
-    #    v = str(etree.tostring(v)).rstrip("'").lstrip("b'")
-    #    imgkit.from_string(v,'voi.png')
 
     # Scrape all variant tables from ECDC
     tables = tree.xpath('//table[@class="GridTable4-Accent61 table table-bordered table-striped"]')
@@ -168,23 +160,7 @@ async def variants(ctx):
         filename = 'voi_{}.png'.format(i)
         files.append(filename)
         imgkit.from_string(v,filename)
-
-    # VoC / VoI description from WHO
-    general_info = """>>> The WHO currently categorizes two groups of variants:
-
-**Variants of Concern (VOC):**
-A SARS-CoV-2 variant that meets the definition of a VOI (see below) and, through a comparative assessment, has been demonstrated to be associated with one or more of the following changes at a degree of global public health significance: 
-    - Increase in transmissibility or detrimental change in COVID-19 epidemiology; OR
-    - Increase in virulence or change in clinical disease presentation; OR
-    - Decrease in effectiveness of public health and social measures or available diagnostics, vaccines, therapeutics.  
-    
-**Variants of Interest (VOI):**
-A SARS-CoV-2 variant : 
-    - with genetic changes that are predicted or known to affect virus characteristics such as transmissibility, disease severity, immune escape, diagnostic or therapeutic escape; AND 
-    - Identified to cause significant community transmission or multiple COVID-19 clusters, in multiple countries with increasing relative prevalence alongside increasing number of cases over time, or other apparent epidemiological impacts to suggest an emerging risk to global public health. \n\n"""
-    #await ctx.send(general_info)
-    #for img in ["voc.png","voi.png"]:
-        #await ctx.send(file=discord.File(img))
+        trim(filename)
 
     # Various variants groups + their description from ECDC
     var_heads = [
@@ -206,23 +182,30 @@ A SARS-CoV-2 variant :
             ]
     ]
     await ctx.send("**> Please see https://www.ecdc.europa.eu/en/covid-19/variants-concern for details**")
+    # Send image per variant group
     for item in list(zip(files,var_heads)):
         await ctx.send("**> {}**".format(item[1][0]))
         await ctx.send("> {}".format(item[1][1]))
         await ctx.send(file=discord.File(item[0]))
 
-# ImportError: dlopen(/Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/PIL/_imaging.cpython-39-darwin.so, 2): Symbol not found: _clock_gettime
-# probably needs newer OS
-# def trim(source_filepath, target_filepath=None, background=None):
-#     if not target_filepath:
-#         target_filepath = source_filepath
-#     img = Image.open(source_filepath)
-#     if background is None:
-#         background = img.getpixel((0, 0))
-#     border = Image.new(img.mode, img.size, background)
-#     diff = ImageChops.difference(img, border)
-#     bbox = diff.getbbox()
-#     img = img.crop(bbox) if bbox else img
-#     img.save(target_filepath)
+# Copied from user norok2 at https://stackoverflow.com/a/38643741
+def trim(source_filepath, target_filepath=None, background=None):
+    if not target_filepath:
+        target_filepath = source_filepath
+    img = Image.open(source_filepath)
+    if background is None:
+        background = img.getpixel((0, 0))
+    border = Image.new(img.mode, img.size, background)
+    diff = ImageChops.difference(img, border)
+    bbox = diff.getbbox()
+    img = img.crop(bbox) if bbox else img
+    img.save(target_filepath)
+
+# Shutdown command
+# copied from yungmaz13 at https://stackoverflow.com/a/66144295
+@bot.command()
+#@commands.is_owner()
+async def shutdown(context):
+    exit()
 
 bot.run(TOKEN)
