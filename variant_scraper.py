@@ -18,6 +18,7 @@ import country_converter as coco
 import pickle
 from lxml import etree
 import imgkit
+#from PIL import Image, ImageChops
 
 # verification token for bot
 with open('variant_token.txt','r') as tokenfile:
@@ -136,9 +137,9 @@ async def parse(ctx):
 def text(elt):
     return elt.text_content().replace(u'\xa0', u' ')
 
-# Retrieve variant-specific aggregate info
+# Retrieve variant information from the WHO
 @bot.command()   
-async def vars(ctx):
+async def variants(ctx):
     global variants
     who_page = requests.get("https://www.who.int/en/activities/tracking-SARS-CoV-2-variants/")
     if who_page:
@@ -154,7 +155,8 @@ async def vars(ctx):
         v = str(etree.tostring(v)).rstrip("'").lstrip("b'")
         imgkit.from_string(v,'voi.png')
 
-    general_info = """The WHO currently categorizes two groups of variants:
+    # VoC / VoI description from WHO
+    general_info = """>>> The WHO currently categorizes two groups of variants:
 
 **Variants of Concern (VOC):**
 A SARS-CoV-2 variant that meets the definition of a VOI (see below) and, through a comparative assessment, has been demonstrated to be associated with one or more of the following changes at a degree of global public health significance: 
@@ -165,13 +167,24 @@ A SARS-CoV-2 variant that meets the definition of a VOI (see below) and, through
 **Variants of Interest (VOI):**
 A SARS-CoV-2 variant : 
     - with genetic changes that are predicted or known to affect virus characteristics such as transmissibility, disease severity, immune escape, diagnostic or therapeutic escape; AND 
-    - Identified to cause significant community transmission or multiple COVID-19 clusters, in multiple countries with increasing relative prevalence alongside increasing number of cases over time, or other apparent epidemiological impacts to suggest an emerging risk to global public health.
-    
-    
-    """
+    - Identified to cause significant community transmission or multiple COVID-19 clusters, in multiple countries with increasing relative prevalence alongside increasing number of cases over time, or other apparent epidemiological impacts to suggest an emerging risk to global public health. \n\n"""
     await ctx.send(general_info)
+    # Send VoC/VoI table images
     for img in ["voc.png","voi.png"]:
         await ctx.send(file=discord.File(img))
-    
+
+# ImportError: dlopen(/Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/PIL/_imaging.cpython-39-darwin.so, 2): Symbol not found: _clock_gettime
+# probably needs newer OS
+# def trim(source_filepath, target_filepath=None, background=None):
+#     if not target_filepath:
+#         target_filepath = source_filepath
+#     img = Image.open(source_filepath)
+#     if background is None:
+#         background = img.getpixel((0, 0))
+#     border = Image.new(img.mode, img.size, background)
+#     diff = ImageChops.difference(img, border)
+#     bbox = diff.getbbox()
+#     img = img.crop(bbox) if bbox else img
+#     img.save(target_filepath)
 
 bot.run(TOKEN)
