@@ -205,6 +205,7 @@ A SARS-CoV-2 variant :
             "These additional variants of SARS-CoV-2 have been de-escalated based on at least one the following criteria: (1) the variant is no longer circulating, (2) the variant has been circulating for a long time without any impact on the overall epidemiological situation, (3) scientific evidence demonstrates that the variant is not associated with any concerning properties."
             ]
     ]
+    await ctx.send("**> Please see https://www.ecdc.europa.eu/en/covid-19/variants-concern for details**")
     for item in list(zip(files,var_heads)):
         await ctx.send("**> {}**".format(item[1][0]))
         await ctx.send("> {}".format(item[1][1]))
