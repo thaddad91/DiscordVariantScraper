@@ -14,4 +14,6 @@ From GISAID: *"Observed frequencies are subject to sampling and reporting biases
 
 ![Alt text](images/Github_Example2.png?raw=true "Variants percentages from GISAID")
 
-![Alt text](images/Github_example3.png?raw=true "WHO variant tables")
+![Alt text](images/ecdc1.png?raw=true "Variant tables")
+
+![Alt text](images/ecdc2.png?raw=true "Variant tables")
