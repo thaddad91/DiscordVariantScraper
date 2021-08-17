@@ -11,6 +11,7 @@
 # - command for variant-specific info, with recent papers, news etc.
 # - wrapper for scrape/parse
 
+import sys
 import discord
 from os import EX_CANTCREAT
 from discord.ext import commands
@@ -23,9 +24,16 @@ import imgkit
 from PIL import Image, ImageChops
 
 # verification token for bot
-with open('variant_token.txt','r') as tokenfile:
-    TOKEN = tokenfile.read()
-assert TOKEN != ""
+try:
+    with open('variant_token.txt','r') as tokenfile:
+        TOKEN = tokenfile.read()
+    assert TOKEN != ""
+except IOError:
+    print("Can't open file.")
+    sys.exit(1)
+except Exception as e:
+    print(e)
+    sys.exit(1)
 
 # define command prefix and global vars
 bot = commands.Bot(command_prefix='!')
