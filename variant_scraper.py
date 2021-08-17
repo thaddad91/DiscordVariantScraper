@@ -152,7 +152,7 @@ def text(elt):
 
 # Retrieve variant information from the ECDC
 @bot.command()   
-async def variants(ctx):
+async def variants_overview(ctx):
     global variants
 
     # Scrape ECDC variant page
@@ -165,6 +165,10 @@ async def variants(ctx):
     files = []
     for i,t in enumerate(tables):
         v = str(etree.tostring(t)).rstrip("'").lstrip("b'").replace('\\n','').replace('\\t','')
+        # Add table header style
+        v = v.replace('<th>','<th style="border-width:1px;border-style:solid;border-color:#121212;background-color:#00bbea;text-align:left;vertical-align:top;">')
+        # Add borders to cells
+        v = v.replace('<td>','<td style="border-width:1px;border-style:solid;border-color:#121212;text-align:left;vertical-align:top;">')
         filename = 'voi_{}.png'.format(i)
         files.append(filename)
         imgkit.from_string(v,filename)
