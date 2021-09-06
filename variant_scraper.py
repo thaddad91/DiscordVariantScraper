@@ -161,7 +161,7 @@ async def variants_overview(ctx):
         tree = etree.HTML(ecdc_page.content)
 
     # Scrape all variant tables from ECDC
-    tables = tree.xpath('//table[@class="GridTable4-Accent61 table table-bordered table-striped"]')
+    tables = tree.xpath('//table[contains(@class,"GridTable4-Accent61 table table-bordered")]')#'//table[@class="GridTable4-Accent61 table table-bordered table-striped"]')
     files = []
     for i,t in enumerate(tables):
         v = str(etree.tostring(t)).rstrip("'").lstrip("b'").replace('\\n','').replace('\\t','')
