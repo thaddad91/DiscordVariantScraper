@@ -236,4 +236,11 @@ def trim(source_filepath, target_filepath=None, background=None):
 async def shutdown(context):
     exit()
 
+@bot.event
+async  def on_ready():
+    scrape.start()
+    parse.start()
+    variants_overview.start()
+    print('bot is active')
+
 bot.run(TOKEN)
