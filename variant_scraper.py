@@ -50,7 +50,7 @@ var_perc = None
 #@bot.command()
 #@commands.has_permissions(administrator = True)
 @tasks.loop(minutes = 2)
-async def scrape(ctx):
+async def scrape():
     print("Scraping...")
     global variants, countries, var_perc, ch_vardis
     channel = bot.get_channel(ch_vardis)
@@ -102,7 +102,7 @@ async def scrape(ctx):
 #@bot.command()
 #@commands.has_permissions(administrator = True)
 @tasks.loop(hours = 2)
-async def parse(ctx):
+async def parse():
     global variants, countries, var_perc, ch_vardis
     channel = bot.get_channel(ch_vardis)
     # check if empty vars, if so -> try loading from file
@@ -167,7 +167,7 @@ def text(elt):
 #@bot.command()
 #@commands.has_permissions(administrator = True)
 @tasks.loop(minutes = 2)
-async def variants_overview(ctx):
+async def variants_overview():
     global variants, ch_covvar
 
     channel = bot.get_channel(ch_covvar)
