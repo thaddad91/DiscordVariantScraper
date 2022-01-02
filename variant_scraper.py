@@ -46,6 +46,7 @@ var_perc = None
 
 # scrape GISAID data
 @bot.command()
+@commands.has_permissions(administrator = True)
 async def scrape(ctx):
     print("Scraping...")
     global variants, countries, var_perc
@@ -93,7 +94,8 @@ async def scrape(ctx):
     await ctx.send("> GISAID has been scraped. :white_check_mark:")
 
 # parse scraped data to Discord
-@bot.command()   
+@bot.command()
+@commands.has_permissions(administrator = True)
 async def parse(ctx):
     global variants, countries, var_perc
     # check if empty vars, if so -> try loading from file
@@ -151,7 +153,8 @@ def text(elt):
     return elt.text_content().replace(u'\xa0', u' ')
 
 # Retrieve variant information from the ECDC
-@bot.command()   
+@bot.command()
+@commands.has_permissions(administrator = True)
 async def variants_overview(ctx):
     global variants
 
