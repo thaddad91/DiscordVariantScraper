@@ -14,7 +14,7 @@
 import sys
 import discord
 from os import EX_CANTCREAT
-from discord.ext import commands
+from discord.ext import commands, tasks
 import requests, re, json
 import country_converter as coco
 import pickle
@@ -42,9 +42,6 @@ bot = commands.Bot(command_prefix='!')
 ch_vardis = 927216007121092658 # bub - variants-distritbution
 ch_covvar = 927214034011422771 # bub - covid-variants
 
-# Placeholder for bot message to specific channel
-# channel = bot.get_channel('032198472741')
-# await channel.send(msg)
 variants = None
 countries = None
 var_perc = None
@@ -52,6 +49,7 @@ var_perc = None
 # scrape GISAID data
 @bot.command()
 @commands.has_permissions(administrator = True)
+@tasks.loop(hours=24)
 async def scrape(ctx):
     print("Scraping...")
     global variants, countries, var_perc, ch_vardis
@@ -103,6 +101,7 @@ async def scrape(ctx):
 # parse scraped data to Discord
 @bot.command()
 @commands.has_permissions(administrator = True)
+@tasks.loop(hours=24)
 async def parse(ctx):
     global variants, countries, var_perc, ch_vardis
     channel = bot.get_channel(ch_vardis)
@@ -167,6 +166,7 @@ def text(elt):
 # Retrieve variant information from the ECDC
 @bot.command()
 @commands.has_permissions(administrator = True)
+@tasks.loop(minutes=3)
 async def variants_overview(ctx):
     global variants, ch_covvar
 
