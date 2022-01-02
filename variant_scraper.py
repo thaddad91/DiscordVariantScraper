@@ -39,8 +39,8 @@ except Exception as e:
 bot = commands.Bot(command_prefix='!')
 
 # Channel ID's
-ch_vardis = '927216007121092658' # bub - variants-distritbution
-ch_covvar = '927214034011422771' # bub - covid-variants
+ch_vardis = 927216007121092658 # bub - variants-distritbution
+ch_covvar = 927214034011422771 # bub - covid-variants
 
 # Placeholder for bot message to specific channel
 # channel = bot.get_channel('032198472741')
