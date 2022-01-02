@@ -49,7 +49,7 @@ var_perc = None
 # scrape GISAID data
 #@bot.command()
 #@commands.has_permissions(administrator = True)
-@tasks.loop(minutes = 2)
+@tasks.loop(hours = 24)
 async def scrape():
     print("Scraping...")
     global variants, countries, var_perc, ch_vardis
@@ -101,7 +101,7 @@ async def scrape():
 # parse scraped data to Discord
 #@bot.command()
 #@commands.has_permissions(administrator = True)
-@tasks.loop(hours = 2)
+@tasks.loop(hours = 24)
 async def parse():
     global variants, countries, var_perc, ch_vardis
     channel = bot.get_channel(ch_vardis)
@@ -166,7 +166,7 @@ def text(elt):
 # Retrieve variant information from the ECDC
 #@bot.command()
 #@commands.has_permissions(administrator = True)
-@tasks.loop(minutes = 2)
+@tasks.loop(hours = 24)
 async def variants_overview():
     global variants, ch_covvar
 
@@ -232,10 +232,11 @@ def trim(source_filepath, target_filepath=None, background=None):
 # Shutdown command
 # copied from yungmaz13 at https://stackoverflow.com/a/66144295
 @bot.command()
-#@commands.is_owner()
+@commands.has_permissions(administrator = True)
 async def shutdown(context):
     exit()
 
+# Run functions on 24h scheduler
 @bot.event
 async  def on_ready():
     scrape.start()
