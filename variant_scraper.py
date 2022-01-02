@@ -52,9 +52,10 @@ var_perc = None
 # scrape GISAID data
 @bot.command()
 @commands.has_permissions(administrator = True)
-async def scrape(ctx,channel):
+async def scrape(ctx):
     print("Scraping...")
     global variants, countries, var_perc, ch_vardis
+    channel = bot.get_channel(ch_vardis)
     # get config with actual variants displayed
     pageconfig = requests.get('https://mendel3.bii.a-star.edu.sg/METHODS/corona/gamma/MUTATIONS/data/config.json')
     pageconfig = pageconfig.text
@@ -97,13 +98,12 @@ async def scrape(ctx,channel):
     with open("data.pickle","wb") as f:
         pickle.dump([variants,countries,var_perc], f)
     #await ctx.send("> GISAID has been scraped. :white_check_mark:")
-    channel = bot.get_channel(ch_vardis)
     await channel.send("> GISAID has been scraped. :white_check_mark:")
 
 # parse scraped data to Discord
 @bot.command()
 @commands.has_permissions(administrator = True)
-async def parse(ctx,channel):
+async def parse(ctx):
     global variants, countries, var_perc, ch_vardis
     channel = bot.get_channel(ch_vardis)
     # check if empty vars, if so -> try loading from file
@@ -167,7 +167,7 @@ def text(elt):
 # Retrieve variant information from the ECDC
 @bot.command()
 @commands.has_permissions(administrator = True)
-async def variants_overview(ctx,channel):
+async def variants_overview(ctx):
     global variants, ch_covvar
 
     channel = bot.get_channel(ch_covvar)
