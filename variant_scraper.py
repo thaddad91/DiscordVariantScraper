@@ -37,6 +37,11 @@ except Exception as e:
 
 # define command prefix and global vars
 bot = commands.Bot(command_prefix='!')
+
+# Channel ID's
+ch_vardis = '927216007121092658' # bub - variants-distritbution
+ch_covvar = '927214034011422771' # bub - covid-variants
+
 # Placeholder for bot message to specific channel
 # channel = bot.get_channel('032198472741')
 # await channel.send(msg)
@@ -49,7 +54,7 @@ var_perc = None
 @commands.has_permissions(administrator = True)
 async def scrape(ctx):
     print("Scraping...")
-    global variants, countries, var_perc
+    global variants, countries, var_perc, ch_vardis
     # get config with actual variants displayed
     pageconfig = requests.get('https://mendel3.bii.a-star.edu.sg/METHODS/corona/gamma/MUTATIONS/data/config.json')
     pageconfig = pageconfig.text
@@ -91,13 +96,16 @@ async def scrape(ctx):
     print("Saving to file...")
     with open("data.pickle","wb") as f:
         pickle.dump([variants,countries,var_perc], f)
-    await ctx.send("> GISAID has been scraped. :white_check_mark:")
+    #await ctx.send("> GISAID has been scraped. :white_check_mark:")
+    channel = bot.get_channel(ch_vardis)
+    await channel.send("> GISAID has been scraped. :white_check_mark:")
 
 # parse scraped data to Discord
 @bot.command()
 @commands.has_permissions(administrator = True)
 async def parse(ctx):
-    global variants, countries, var_perc
+    global variants, countries, var_perc, ch_vardis
+    channel = bot.get_channel(ch_vardis)
     # check if empty vars, if so -> try loading from file
     if any([var == None for var in [variants, countries, var_perc]]):
         try:
@@ -117,7 +125,8 @@ async def parse(ctx):
     discl3 = "> Observed frequencies are subject to sampling and reporting biases and **do not** represent exact prevalence."
     discl4 = "> See https://www.gisaid.org/hcov19-variants/ for more info."
     disclaimers = [discl1,discl2,discl3,discl4]
-    await ctx.send("\n".join(disclaimers))
+    #await ctx.send("\n".join(disclaimers))
+    await channel.send("\n".join(disclaimers))
 
     # parse percentages per country, per variant
     for country in countries:
@@ -143,11 +152,14 @@ async def parse(ctx):
                 res[0],res[1]) if float(res[1])<50 
                 else "**{}:** **{}**".format(res[0],res[1]) 
                 for res in results])
-            await ctx.send(sent1)
-            await ctx.send(sent2)
+            #await ctx.send(sent1)
+            #await ctx.send(sent2)
+            await channel.send(sent1)
+            await channel.send(sent2)
         else:
             print(country, percs)
-    await ctx.send("> All countries parsed. :white_check_mark:")
+    #await ctx.send("> All countries parsed. :white_check_mark:")
+    await channel.send("> All countries parsed. :white_check_mark:")
 
 def text(elt):
     return elt.text_content().replace(u'\xa0', u' ')
@@ -156,8 +168,9 @@ def text(elt):
 @bot.command()
 @commands.has_permissions(administrator = True)
 async def variants_overview(ctx):
-    global variants
+    global variants, ch_covvar
 
+    channel = bot.get_channel(ch_covvar)
     # Scrape ECDC variant page
     ecdc_page = requests.get("https://www.ecdc.europa.eu/en/covid-19/variants-concern")
     if ecdc_page:
@@ -196,12 +209,12 @@ async def variants_overview(ctx):
             "These additional variants of SARS-CoV-2 have been de-escalated based on at least one the following criteria: (1) the variant is no longer circulating, (2) the variant has been circulating for a long time without any impact on the overall epidemiological situation, (3) scientific evidence demonstrates that the variant is not associated with any concerning properties."
             ]
     ]
-    await ctx.send("**> Please see https://www.ecdc.europa.eu/en/covid-19/variants-concern for details**")
+    await channel.send("**> Please see https://www.ecdc.europa.eu/en/covid-19/variants-concern for details**")
     # Send image per variant group
     for item in list(zip(files,var_heads)):
-        await ctx.send("**> {}**".format(item[1][0]))
-        await ctx.send("> {}".format(item[1][1]))
-        await ctx.send(file=discord.File(item[0]))
+        await channel.send("**> {}**".format(item[1][0]))
+        await channel.send("> {}".format(item[1][1]))
+        await channel.send(file=discord.File(item[0]))
 
 # Copied from user norok2 at https://stackoverflow.com/a/38643741
 def trim(source_filepath, target_filepath=None, background=None):
