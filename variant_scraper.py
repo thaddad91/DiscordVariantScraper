@@ -171,7 +171,7 @@ async def parse():
             counts = chunk[1].split("\t")
             print(type(counts))
             print(counts)
-            embed.add_field(name=chunk[0], value="\n".join("{}".format(counts)), inline=True)
+            embed.add_field(name=chunk[0], value="{}".format("\n".join(counts)), inline=True)
         await channel.send(embed=embed)
 
     await channel.send("> All countries parsed. :white_check_mark:")
