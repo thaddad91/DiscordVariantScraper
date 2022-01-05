@@ -83,13 +83,14 @@ async def scrape():
         for i in range(0,len(var_json)):
             country = var_json[i]['country']
             fourwktotal = var_json[i]['numcountrytotal_last4wks']
-            if country not in countries.keys():
-                countries[country] = fourwktotal
-                #countries.append(country)
-            if var not in var_perc.keys():
-                var_perc[var] = {var_json[i]['country']:var_json[i]['percvui_last4wks']}
-            else:
-                var_perc[var].update({var_json[i]['country']:var_json[i]['percvui_last4wks']})
+            if int(fourwktotal) > 0: # omit very low info countries
+                if country not in countries.keys():
+                    countries[country] = fourwktotal
+                    #countries.append(country)
+                if var not in var_perc.keys():
+                    var_perc[var] = {var_json[i]['country']:var_json[i]['percvui_last4wks']}
+                else:
+                    var_perc[var].update({var_json[i]['country']:var_json[i]['percvui_last4wks']})
         print(str(variant)+" done")
     # save scraped data to file
     print("Saving to file...")
@@ -144,7 +145,7 @@ async def parse():
             # change country name to iso-code and flag
             iso = coco.convert(country, to="ISO2")
             flag_iso = ' :flag_'+iso.lower()[:2]+':'
-            msg1 = flag_iso+" **"+country+"**  ({} sequences)".format(fourwktotal)
+            msg1 = flag_iso+" **"+country+"**  {} sequences".format(fourwktotal)
             # zip variants with percentages
             results = list(zip([var[1].split()[0] for var in variants], percs))
 #            msg2 = "\t".join(["{}: {}".format(
@@ -168,8 +169,10 @@ async def parse():
         msg_chunk = messages[i:i + n]
         embed=discord.Embed()
         for chunk in msg_chunk:
-            counts = chunk[1].split("\t")
-            embed.add_field(name=chunk[0], value="{}".format("\n".join(counts)), inline=True)
+            #counts = chunk[1].split("\t")
+            embed.add_field(
+                name="{}".format("\n".join(chunk[0].split("  "))), 
+                value="{}".format("\n".join(chunk[1].split("\t"))), inline=True)
         await channel.send(embed=embed)
 
     await channel.send("> All countries parsed. :white_check_mark:")
