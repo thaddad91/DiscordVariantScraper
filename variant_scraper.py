@@ -149,10 +149,10 @@ async def parse():
             # change country name to iso-code and flag
             iso = coco.convert(country, to="ISO2")
             flag_iso = ' :flag_'+iso.lower()[:2]+':'
-            sent1 = "**> "+flag_iso+" "+country+" -- 4 week total sequenced: {} **".format(fourwktotal)
+            sent1 = "**>>> "+flag_iso+" "+country+" -- 4 week total sequenced: {} **".format(fourwktotal)
             # zip variants with percentages
             results = list(zip([var[1].split()[0] for var in variants], percs))
-            sent2 = "> \t\t\t\t"+"\t".join(["{}: {}".format(
+            sent2 = ">>> \t\t\t\t"+"\t".join(["{}: {}".format(
                 res[0],res[1]) if float(res[1])<50 
                 else "**{}:** **{}**".format(res[0],res[1]) 
                 for res in results])
