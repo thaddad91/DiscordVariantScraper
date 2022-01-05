@@ -133,6 +133,7 @@ async def parse():
     messages = []
     sorted_countries = list(countries.keys()).sort()
     print(sorted_countries)
+    print(countries.keys())
     for country in sorted_countries:#countries.keys():
         fourwktotal = countries[country]
         percs = []
