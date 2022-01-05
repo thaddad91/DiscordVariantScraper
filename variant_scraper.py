@@ -22,6 +22,7 @@ from lxml import etree
 import imgkit
 #from requests.api import head
 from PIL import Image, ImageChops
+import operator # sort dictionary by value
 
 # verification token for bot
 try:
@@ -134,8 +135,14 @@ async def parse():
 
     # parse percentages per country, per variant
     messages = []
-    sorted_countries = list(countries.keys())
-    sorted_countries.sort()
+
+    # sort alphabetically
+    #sorted_countries = list(countries.keys())
+    #sorted_countries.sort()
+    
+    # sort by most sequences
+    sorted_countries = dict(sorted(countries.items(), key=operator.itemgetter(1),reverse=True))
+    sorted_countries = list(sorted_countries.keys())
     for country in sorted_countries:
         fourwktotal = countries[country]
         percs = []
