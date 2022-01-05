@@ -82,7 +82,7 @@ async def scrape():
         if not var_text:
             return
         var_json = json.loads(var_text)
-        for i in range(0,len(var_json)+1):
+        for i in range(0,len(var_json)):
             country = var_json[i]['country']
             fourwktotal = var_json[i]['numcountrytotal_last4wks']
             if country not in countries.keys():
