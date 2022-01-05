@@ -151,7 +151,7 @@ async def parse():
 #                res[0],res[1]) if float(res[1])<50 
 #                else "**{}:** **{}**".format(res[0],res[1]) 
 #                for res in results])
-            msg2 = "\t".join(["{}: {:3.1f}%".format(res[0],float(res[1])) for res in results])
+            msg2 = "\t".join(["{:7s}: {:3.0f}%".format(res[0],float(res[1])) for res in results])
             messages.append([msg1,msg2])
         else:
             print(country, percs)
@@ -169,8 +169,6 @@ async def parse():
         embed=discord.Embed()
         for chunk in msg_chunk:
             counts = chunk[1].split("\t")
-            print(type(counts))
-            print(counts)
             embed.add_field(name=chunk[0], value="{}".format("\n".join(counts)), inline=True)
         await channel.send(embed=embed)
 
