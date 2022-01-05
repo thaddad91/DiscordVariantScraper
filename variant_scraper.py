@@ -49,7 +49,7 @@ var_perc = None
 # scrape GISAID data
 #@bot.command()
 #@commands.has_permissions(administrator = True)
-@tasks.loop(hours = 24)
+@tasks.loop(minutes = 10)
 async def scrape():
     print("Scraping...")
     global variants, countries, var_perc, ch_vardis
@@ -96,12 +96,13 @@ async def scrape():
     with open("data.pickle","wb") as f:
         pickle.dump([variants,countries,var_perc], f)
     #await ctx.send("> GISAID has been scraped. :white_check_mark:")
+    await channel.purge(amount=100000)
     await channel.send("> GISAID has been scraped. :white_check_mark:")
 
 # parse scraped data to Discord
 #@bot.command()
 #@commands.has_permissions(administrator = True)
-@tasks.loop(hours = 24)
+@tasks.loop(minutes = 10)
 async def parse():
     global variants, countries, var_perc, ch_vardis
     channel = bot.get_channel(ch_vardis)
@@ -119,6 +120,7 @@ async def parse():
         except Exception as e:
             print("Non-IOError, try rerunning !scrape")
             print(e)
+    await channel.purge(amount=100000)
     discl1 = "**> DISCLAIMER**"
     discl2 = "> This bot scrapes the relative percentages of genome **submissions of the past 4 weeks** from the tracked variants to GISAID. The variants are limited to the Variants of Concern and Variants of Interest as listed by the WHO (https://www.who.int/en/activities/tracking-SARS-CoV-2-variants/)."
     discl3 = "> Observed frequencies are subject to sampling and reporting biases and **do not** represent exact prevalence."
@@ -166,7 +168,7 @@ def text(elt):
 # Retrieve variant information from the ECDC
 #@bot.command()
 #@commands.has_permissions(administrator = True)
-@tasks.loop(hours = 24)
+@tasks.loop(minutes = 10)
 async def variants_overview():
     global variants, ch_covvar
 
@@ -209,6 +211,7 @@ async def variants_overview():
             "These additional variants of SARS-CoV-2 have been de-escalated based on at least one the following criteria: (1) the variant is no longer circulating, (2) the variant has been circulating for a long time without any impact on the overall epidemiological situation, (3) scientific evidence demonstrates that the variant is not associated with any concerning properties."
             ]
     ]
+    await channel.purge(amount=100000)
     await channel.send("**> Please see https://www.ecdc.europa.eu/en/covid-19/variants-concern for details**")
     # Send image per variant group
     for item in list(zip(files,var_heads)):
