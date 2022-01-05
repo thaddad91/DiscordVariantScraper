@@ -47,8 +47,6 @@ countries = None
 var_perc = None
 
 # scrape GISAID data
-#@bot.command()
-#@commands.has_permissions(administrator = True)
 @tasks.loop(hours = 24)
 async def scrape():
     print("Scraping...")
@@ -97,13 +95,10 @@ async def scrape():
     print("Saving to file...")
     with open("data.pickle","wb") as f:
         pickle.dump([variants,countries,var_perc], f)
-    #await ctx.send("> GISAID has been scraped. :white_check_mark:")
     await channel.purge(limit=1000)
     await channel.send("> GISAID has been scraped. :white_check_mark:")
 
 # parse scraped data to Discord
-#@bot.command()
-#@commands.has_permissions(administrator = True)
 @tasks.loop(hours = 24)
 async def parse():
     global variants, countries, var_perc, ch_vardis
@@ -128,7 +123,6 @@ async def parse():
     discl3 = "> Observed frequencies are subject to sampling and reporting biases and **do not** represent exact prevalence."
     discl4 = "> See https://www.gisaid.org/hcov19-variants/ for more info."
     disclaimers = [discl1,discl2,discl3,discl4]
-    #await ctx.send("\n".join(disclaimers))
     await channel.send("\n".join(disclaimers))
 
     # parse percentages per country, per variant
@@ -150,22 +144,14 @@ async def parse():
             # change country name to iso-code and flag
             iso = coco.convert(country, to="ISO2")
             flag_iso = ' :flag_'+iso.lower()[:2]+':'
-            #sent1 = "**>>> "+flag_iso+" "+country+" -- 4 week total sequenced: {} **".format(fourwktotal)
             msg1 = flag_iso+" **"+country+"**  ({} sequences)".format(fourwktotal)
             # zip variants with percentages
             results = list(zip([var[1].split()[0] for var in variants], percs))
-            #sent2 = ">>> \t\t\t\t"+"\t".join(["{}: {}".format(
-            #    res[0],res[1]) if float(res[1])<50 
-            #    else "**{}:** **{}**".format(res[0],res[1]) 
-            #    for res in results])
-            msg2 = "\t".join(["{}: {}".format(
-                res[0],res[1]) if float(res[1])<50 
-                else "**{}:** **{}**".format(res[0],res[1]) 
-                for res in results])
-            #await ctx.send(sent1)
-            #await ctx.send(sent2)
-            #await channel.send(sent1)
-            #await channel.send(sent2)
+#            msg2 = "\t".join(["{}: {}".format(
+#                res[0],res[1]) if float(res[1])<50 
+#                else "**{}:** **{}**".format(res[0],res[1]) 
+#                for res in results])
+            msg2 = "\t".join(["{}: {:3.0f}".format(res[0],res[1]) for res in results])
             messages.append([msg1,msg2])
         else:
             print(country, percs)
@@ -174,15 +160,12 @@ async def parse():
         msg_chunk = messages[i:i + n]
         msg_quote = ">>> "+"\n".join("{}\n\t\t\t\t{}".format(msg[0],msg[1]) for msg in msg_chunk)
         await channel.send(msg_quote)
-    #await ctx.send("> All countries parsed. :white_check_mark:")
     await channel.send("> All countries parsed. :white_check_mark:")
 
 def text(elt):
     return elt.text_content().replace(u'\xa0', u' ')
 
 # Retrieve variant information from the ECDC
-#@bot.command()
-#@commands.has_permissions(administrator = True)
 @tasks.loop(hours = 24)
 async def variants_overview():
     global variants, ch_covvar
