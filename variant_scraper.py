@@ -151,7 +151,7 @@ async def parse():
             iso = coco.convert(country, to="ISO2")
             flag_iso = ' :flag_'+iso.lower()[:2]+':'
             #sent1 = "**>>> "+flag_iso+" "+country+" -- 4 week total sequenced: {} **".format(fourwktotal)
-            msg1 = flag_iso+" "+country+" -- 4 week total sequenced: {}".format(fourwktotal)
+            msg1 = flag_iso+" **"+country+"** \t\t -- sequenced past 4 weeks: {}".format(fourwktotal)
             # zip variants with percentages
             results = list(zip([var[1].split()[0] for var in variants], percs))
             #sent2 = ">>> \t\t\t\t"+"\t".join(["{}: {}".format(
