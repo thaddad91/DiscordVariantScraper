@@ -74,7 +74,7 @@ async def scrape():
     # from here all data from the past 4 weeks will be scraped, on a per variant basis
     pre_url = "https://mendel3.bii.a-star.edu.sg/METHODS/corona/gamma/MUTATIONS/data/countryCount_{}.json"
     var_perc = {}
-    countries = []
+    countries = {}
     for variant in variants:
         var, descrip = variant
         var_url = pre_url.format(var)
@@ -82,10 +82,12 @@ async def scrape():
         if not var_text:
             return
         var_json = json.loads(var_text)
-        for i in range(0,len(var_json)):
+        for i in range(0,len(var_json)+1):
             country = var_json[i]['country']
-            if country not in countries:
-                countries.append(country)
+            fourwktotal = var_json[i]['numcountrytotal_last4wks']
+            if country not in countries.keys():
+                countries[country] = fourwktotal
+                #countries.append(country)
             if var not in var_perc.keys():
                 var_perc[var] = {var_json[i]['country']:var_json[i]['percvui_last4wks']}
             else:
@@ -130,7 +132,8 @@ async def parse():
     await channel.send("\n".join(disclaimers))
 
     # parse percentages per country, per variant
-    for country in countries:
+    for country in countries.keys():
+        fourwktotal = countries[country]
         percs = []
         for var,descrip in variants:
             try:
@@ -146,7 +149,7 @@ async def parse():
             # change country name to iso-code and flag
             iso = coco.convert(country, to="ISO2")
             flag_iso = ' :flag_'+iso.lower()[:2]+':'
-            sent1 = "**> "+flag_iso+" "+country+"**"
+            sent1 = "**> "+flag_iso+" "+country+"** \t\t 4 week total sequenced: "+fourwktotal
             # zip variants with percentages
             results = list(zip([var[1].split()[0] for var in variants], percs))
             sent2 = "> \t\t\t\t"+"\t".join(["{}: {}".format(
@@ -236,22 +239,8 @@ def trim(source_filepath, target_filepath=None, background=None):
 # copied from yungmaz13 at https://stackoverflow.com/a/66144295
 @bot.command()
 @commands.has_permissions(administrator = True)
-async def shutdown(context):
-    exit()
-
-# Super Purge
-@bot.command()
-@commands.has_permissions(administrator = True)
-async def purge_channel(ctx, arg):
-    global ch_vardis, ch_covvar
-    print("Mass purging channel...")
-    if not arg in [ch_covvar,ch_vardis]:
-        await ctx.send("Wrong channel name!")
-        return
-    channel = bot.get_channel(ch_vardis)
-    for i in range(0, 100):
-        await channel.purge(limit=1000)
-    print("Done purging!")
+async def shutdown():
+    sys.exit(1)
 
 # Run functions on 24h scheduler
 @bot.event
