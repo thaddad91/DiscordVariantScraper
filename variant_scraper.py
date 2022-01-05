@@ -128,7 +128,7 @@ async def parse():
 
     # parse percentages per country, per variant
     messages = []
-    for country in countries.keys():
+    for country in countries.keys().sort():
         fourwktotal = countries[country]
         percs = []
         for var,descrip in variants:
@@ -152,7 +152,7 @@ async def parse():
 #                res[0],res[1]) if float(res[1])<50 
 #                else "**{}:** **{}**".format(res[0],res[1]) 
 #                for res in results])
-            msg2 = "\t".join(["{:7s}: {:3.0f}%".format(res[0],float(res[1])) for res in results])
+            msg2 = "\t".join(["{:7s}  {:3.0f}%".format(res[0],float(res[1])) for res in results])
             messages.append([msg1,msg2])
         else:
             print(country, percs)
@@ -163,8 +163,8 @@ async def parse():
     #    msg_quote = ">>> "+"\n".join("{}\n\t\t\t\t{}".format(msg[0],msg[1]) for msg in msg_chunk)
     #    await channel.send(msg_quote)
 
-    # embed
-    n = 3 # 3 countries side by side
+    # embed output
+    n = 4 # 4 countries side by side
     for i in range(0, len(messages), n):
         msg_chunk = messages[i:i + n]
         embed=discord.Embed()
