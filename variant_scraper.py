@@ -151,7 +151,7 @@ async def parse():
 #                res[0],res[1]) if float(res[1])<50 
 #                else "**{}:** **{}**".format(res[0],res[1]) 
 #                for res in results])
-            msg2 = "\t".join(["{}: {:3.0f}".format(res[0],res[1]) for res in results])
+            msg2 = "\t".join(["{}: {:3.0f}".format(res[0],float(res[1])) for res in results])
             messages.append([msg1,msg2])
         else:
             print(country, percs)
