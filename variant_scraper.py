@@ -49,7 +49,7 @@ var_perc = None
 # scrape GISAID data
 #@bot.command()
 #@commands.has_permissions(administrator = True)
-@tasks.loop(minutes = 10)
+@tasks.loop(hours = 24)
 async def scrape():
     print("Scraping...")
     global variants, countries, var_perc, ch_vardis
@@ -102,7 +102,7 @@ async def scrape():
 # parse scraped data to Discord
 #@bot.command()
 #@commands.has_permissions(administrator = True)
-@tasks.loop(minutes = 10)
+@tasks.loop(hours = 24)
 async def parse():
     global variants, countries, var_perc, ch_vardis
     channel = bot.get_channel(ch_vardis)
@@ -168,7 +168,7 @@ def text(elt):
 # Retrieve variant information from the ECDC
 #@bot.command()
 #@commands.has_permissions(administrator = True)
-@tasks.loop(minutes = 10)
+@tasks.loop(hours = 24)
 async def variants_overview():
     global variants, ch_covvar
 
@@ -239,9 +239,23 @@ def trim(source_filepath, target_filepath=None, background=None):
 async def shutdown(context):
     exit()
 
+# Super Purge
+@bot.command()
+@commands.has_permissions(administrator = True)
+async def purge_channel(ctx, arg):
+    global ch_vardis, ch_covvar
+    print("Mass purging channel...")
+    if not arg in [ch_covvar,ch_vardis]:
+        await ctx.send("Wrong channel name!")
+        return
+    channel = bot.get_channel(ch_vardis)
+    for i in range(0, 100):
+        await channel.purge(limit=1000)
+    print("Done purging!")
+
 # Run functions on 24h scheduler
 @bot.event
-async  def on_ready():
+async def on_ready():
     scrape.start()
     parse.start()
     variants_overview.start()
