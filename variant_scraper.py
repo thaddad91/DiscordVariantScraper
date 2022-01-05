@@ -96,7 +96,10 @@ async def scrape():
     print("Saving to file...")
     with open("data.pickle","wb") as f:
         pickle.dump([variants,countries,var_perc], f)
-    await channel.purge(limit=1000)
+    try:
+        await channel.purge(limit=1000)
+    except:
+        pass
     await channel.send("> GISAID has been scraped. :white_check_mark:")
 
 # parse scraped data to Discord
@@ -133,9 +136,7 @@ async def parse():
     messages = []
     sorted_countries = list(countries.keys())
     sorted_countries.sort()
-    #print(sorted_countries)
-    #print(countries.keys())
-    for country in sorted_countries:#countries.keys():
+    for country in sorted_countries:
         fourwktotal = countries[country]
         percs = []
         for var,descrip in variants:
@@ -155,11 +156,7 @@ async def parse():
             msg1 = flag_iso+" **"+country+"**  {} sequences".format(fourwktotal)
             # zip variants with percentages
             results = list(zip([var[1].split()[0] for var in variants], percs))
-#            msg2 = "\t".join(["{}: {}".format(
-#                res[0],res[1]) if float(res[1])<50 
-#                else "**{}:** **{}**".format(res[0],res[1]) 
-#                for res in results])
-            msg2 = "\t".join(["{:7s}     {:3.0f}%".format(res[0],float(res[1])) for res in results])
+            msg2 = "\t".join(["{:7s} {:3.0f}%".format(res[0],float(res[1])) for res in results])
             messages.append([msg1,msg2])
         else:
             print(country, percs)
@@ -171,12 +168,11 @@ async def parse():
     #    await channel.send(msg_quote)
 
     # embed output
-    n = 4 # 4 countries side by side
+    n = 3 # 3 countries side by side
     for i in range(0, len(messages), n):
         msg_chunk = messages[i:i + n]
         embed=discord.Embed()
         for chunk in msg_chunk:
-            #counts = chunk[1].split("\t")
             embed.add_field(
                 name="{}".format("\n".join(chunk[0].split("  "))), 
                 value="{}".format("\n".join(chunk[1].split("\t"))), inline=True)
@@ -231,7 +227,10 @@ async def variants_overview():
             "These additional variants of SARS-CoV-2 have been de-escalated based on at least one the following criteria: (1) the variant is no longer circulating, (2) the variant has been circulating for a long time without any impact on the overall epidemiological situation, (3) scientific evidence demonstrates that the variant is not associated with any concerning properties."
             ]
     ]
-    await channel.purge(limit=1000)
+    try:
+        await channel.purge(limit=1000)
+    except:
+        pass
     await channel.send("**> Please see https://www.ecdc.europa.eu/en/covid-19/variants-concern for details**")
     # Send image per variant group
     for item in list(zip(files,var_heads)):
