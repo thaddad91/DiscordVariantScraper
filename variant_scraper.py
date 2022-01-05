@@ -129,6 +129,7 @@ async def parse():
     # parse percentages per country, per variant
     messages = []
     sorted_countries = list(countries.keys()).sort()
+    print(sorted_countries)
     for country in sorted_countries:#countries.keys():
         fourwktotal = countries[country]
         percs = []
