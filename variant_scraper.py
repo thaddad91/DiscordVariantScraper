@@ -128,7 +128,7 @@ async def parse():
 
     # parse percentages per country, per variant
     messages = []
-    for country in countries.keys().sort():
+    for country in sorted(countries.keys()):
         fourwktotal = countries[country]
         percs = []
         for var,descrip in variants:
@@ -152,7 +152,7 @@ async def parse():
 #                res[0],res[1]) if float(res[1])<50 
 #                else "**{}:** **{}**".format(res[0],res[1]) 
 #                for res in results])
-            msg2 = "\t".join(["{:7s}  {:3.0f}%".format(res[0],float(res[1])) for res in results])
+            msg2 = "\t".join(["{:7s}     {:3.0f}%".format(res[0],float(res[1])) for res in results])
             messages.append([msg1,msg2])
         else:
             print(country, percs)
