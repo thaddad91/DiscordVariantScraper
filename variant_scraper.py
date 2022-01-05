@@ -169,7 +169,9 @@ async def parse():
         embed=discord.Embed()
         for chunk in msg_chunk:
             counts = chunk[1].split("\t")
-            embed.add_field(name=chunk[0], value="\n".join(format(count for count in counts)), inline=True)
+            print(type(counts))
+            print(counts)
+            embed.add_field(name=chunk[0], value="\n".join("{}".format(counts)), inline=True)
         await channel.send(embed=embed)
 
     await channel.send("> All countries parsed. :white_check_mark:")
