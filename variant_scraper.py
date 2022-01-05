@@ -155,11 +155,23 @@ async def parse():
             messages.append([msg1,msg2])
         else:
             print(country, percs)
-    n = 10
+    # quote block
+    #n = 10
+    #for i in range(0, len(messages), n):
+    #    msg_chunk = messages[i:i + n]
+    #    msg_quote = ">>> "+"\n".join("{}\n\t\t\t\t{}".format(msg[0],msg[1]) for msg in msg_chunk)
+    #    await channel.send(msg_quote)
+
+    # embed
+    n = 3 # 3 countries side by side
     for i in range(0, len(messages), n):
         msg_chunk = messages[i:i + n]
-        msg_quote = ">>> "+"\n".join("{}\n\t\t\t\t{}".format(msg[0],msg[1]) for msg in msg_chunk)
-        await channel.send(msg_quote)
+        embed=discord.Embed()
+        for chunk in msg_chunk:
+            counts = chunk[1].split("\t")
+            embed.add_field(name=chunk[0], value="\n".join(format(counts)), inline=True)
+        await channel.send(embed=embed)
+
     await channel.send("> All countries parsed. :white_check_mark:")
 
 def text(elt):
