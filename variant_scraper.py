@@ -132,6 +132,7 @@ async def parse():
     await channel.send("\n".join(disclaimers))
 
     # parse percentages per country, per variant
+    messages = []
     for country in countries.keys():
         fourwktotal = countries[country]
         percs = []
@@ -149,19 +150,30 @@ async def parse():
             # change country name to iso-code and flag
             iso = coco.convert(country, to="ISO2")
             flag_iso = ' :flag_'+iso.lower()[:2]+':'
-            sent1 = "**>>> "+flag_iso+" "+country+" -- 4 week total sequenced: {} **".format(fourwktotal)
+            #sent1 = "**>>> "+flag_iso+" "+country+" -- 4 week total sequenced: {} **".format(fourwktotal)
+            msg1 = flag_iso+" "+country+" -- 4 week total sequenced: {} **".format(fourwktotal)
             # zip variants with percentages
             results = list(zip([var[1].split()[0] for var in variants], percs))
-            sent2 = ">>> \t\t\t\t"+"\t".join(["{}: {}".format(
+            #sent2 = ">>> \t\t\t\t"+"\t".join(["{}: {}".format(
+            #    res[0],res[1]) if float(res[1])<50 
+            #    else "**{}:** **{}**".format(res[0],res[1]) 
+            #    for res in results])
+            msg2 = "\t".join(["{}: {}".format(
                 res[0],res[1]) if float(res[1])<50 
                 else "**{}:** **{}**".format(res[0],res[1]) 
                 for res in results])
             #await ctx.send(sent1)
             #await ctx.send(sent2)
-            await channel.send(sent1)
-            await channel.send(sent2)
+            #await channel.send(sent1)
+            #await channel.send(sent2)
+            messages.append([msg1,msg2])
         else:
             print(country, percs)
+    n = 10
+    for i in range(0, len(messages), n):
+        msg_chunk = messages[i:i + n]
+        msg = ">>> \t\t\t\t"+"\n".join(msg_chunk)
+        await channel.send(msg)
     #await ctx.send("> All countries parsed. :white_check_mark:")
     await channel.send("> All countries parsed. :white_check_mark:")
 
