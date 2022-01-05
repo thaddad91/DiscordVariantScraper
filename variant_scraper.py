@@ -172,7 +172,7 @@ async def parse():
     n = 10
     for i in range(0, len(messages), n):
         msg_chunk = messages[i:i + n]
-        msg_quote = ">>> \t\t\t\t"+"\n".join("{}".format(msg) for msg in msg_chunk)
+        msg_quote = ">>> \t\t\t\t"+"\n".join("{}\n{}".format(msg[0],msg[1]) for msg in msg_chunk)
         await channel.send(msg_quote)
     #await ctx.send("> All countries parsed. :white_check_mark:")
     await channel.send("> All countries parsed. :white_check_mark:")
