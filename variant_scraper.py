@@ -126,14 +126,13 @@ async def parse():
         await channel.purge(limit=1000)
     except:
         pass
-    discl1 = "**> DISCLAIMER**"
-    discl2 = "> This bot scrapes the relative percentages of genome **submissions of the past 4 weeks** from the tracked variants to GISAID. The variants are limited to the Variants of Concern and Variants of Interest as listed by the WHO (https://www.who.int/en/activities/tracking-SARS-CoV-2-variants/)."
-    discl3 = "> Observed frequencies are subject to sampling and reporting biases and **do not** represent exact prevalence."
-    discl4 = "> See https://www.gisaid.org/hcov19-variants/ for more info."
-    disclaimers = [discl1,discl2,discl3,discl4]
-    embed = discord.Embed(title="DISCLAIMER")
-    for disc in disclaimers:
-        embed.add_field(name="{}".format(disc), inline=False)
+    #discl1 = "**> DISCLAIMER**"
+    discl2 = "This bot scrapes the relative percentages of genome **submissions of the past 4 weeks** from the tracked variants to GISAID. The variants are limited to the Variants of Concern and Variants of Interest as listed by the WHO (https://www.who.int/en/activities/tracking-SARS-CoV-2-variants/)."
+    discl3 = "Observed frequencies are subject to sampling and reporting biases and **do not** represent exact prevalence."
+    discl4 = "See https://www.gisaid.org/hcov19-variants/ for more info."
+    disclaimers = [discl2,discl3,discl4]
+    embed = discord.Embed(title="DISCLAIMER", description="{}".format("\n".join(disclaimers)))
+    #embed.add_field(name="{}".format(disc), inline=False)
     author = bot.fetch_user(138254755813130240)
     embed.set_author(name=author, icon_url=author.avatar_url)
     await channel.send(embed=embed)
