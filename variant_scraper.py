@@ -127,7 +127,7 @@ async def parse():
     except:
         pass
     #discl1 = "**> DISCLAIMER**"
-    discl2 = "This bot scrapes the relative percentages of genome **submissions of the past 4 weeks** from the tracked variants to GISAID. The variants are limited to the Variants of Concern and Variants of Interest as listed by the WHO (https://www.who.int/en/activities/tracking-SARS-CoV-2-variants/)."
+    discl2 = "This bot scrapes GISAID for the sequence submissions of tracked variants **of the past 4 weeks** and displays the relative contribution on a per variant basis. The variants are limited to the Variants of Concern and Variants of Interest as listed by the WHO (https://www.who.int/en/activities/tracking-SARS-CoV-2-variants/)."
     discl3 = "Observed frequencies are subject to sampling and reporting biases and **do not** represent exact prevalence."
     discl4 = "See https://www.gisaid.org/hcov19-variants/ for more info."
     disclaimers = [discl2,discl3,discl4]
