@@ -131,7 +131,15 @@ async def parse():
     discl3 = "> Observed frequencies are subject to sampling and reporting biases and **do not** represent exact prevalence."
     discl4 = "> See https://www.gisaid.org/hcov19-variants/ for more info."
     disclaimers = [discl1,discl2,discl3,discl4]
-    await channel.send("\n".join(disclaimers))
+    embed = discord.Embed(title="DISCLAIMER")
+    for disc in disclaimers:
+        embed.add_field(name="{}".format(disc), inline=False)
+    author = bot.fetch_user(138254755813130240)
+    embed.set_author(name=author, icon_url=author.avatar_url)
+    await channel.send(embed=embed)
+    
+    #embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+    #await channel.send("\n".join(disclaimers))
 
     # parse percentages per country, per variant
     messages = []
@@ -139,7 +147,7 @@ async def parse():
     # sort alphabetically
     #sorted_countries = list(countries.keys())
     #sorted_countries.sort()
-    
+
     # sort by most sequences
     sorted_countries = dict(sorted(countries.items(), key=operator.itemgetter(1),reverse=True))
     sorted_countries = list(sorted_countries.keys())
