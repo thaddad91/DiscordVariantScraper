@@ -134,7 +134,7 @@ async def parse():
     embed = discord.Embed(title="DISCLAIMER", description="{}".format("\n".join(disclaimers)))
     #embed.add_field(name="{}".format(disc), inline=False)
     author = bot.fetch_user(138254755813130240)
-    embed.set_author(name=author, icon_url=author.avatar_url)
+    embed.set_author(name=author)
     await channel.send(embed=embed)
     
     #embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
